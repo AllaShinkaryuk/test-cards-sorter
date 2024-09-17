@@ -1,0 +1,128 @@
+openapi: 3.0.0
+info:
+  title: 'Сортировщик карточек путешественника'
+  description: 'PHP API, который сортирует список карточек и возвращает словесное описание, как проделать путешествие.'
+  version: 1.0.0
+paths:
+  /api/sort:
+    post:
+      tags:
+        - cards
+      summary: 'Сортировка посадочных карточек'
+      requestBody:
+        description: 'Массив из посадочных карточек на различные виды транспорта, которые доставляют из точки A в точку B. Карточки перемешаны в случайном порядке.'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                oneOf:
+                  - { $ref: '#/components/schemas/BusCard' }
+                  - { $ref: '#/components/schemas/FlightCard' }
+                  - { $ref: '#/components/schemas/TrainCard' }
+      responses:
+        '200':
+          description: 'Запрос успешно выполнен'
+          content:
+            application/json:
+              schema:
+                properties:
+                  description: { type: string, example: 'Take train 78A from Madrid to Barcelona. Seat 45B.' }
+                type: object
+        '400':
+          description: 'Некорректные входные данные'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Boarding cards do not form a continuous chain.' }
+                type: object
+components:
+  schemas:
+    BusCard:
+      description: 'Карточка на автобус'
+      required:
+        - type
+        - departure
+        - arrival
+        - bus_number
+      properties:
+        type:
+          type: string
+          example: bus
+        departure:
+          type: string
+          example: Barcelona
+        arrival:
+          type: string
+          example: 'Gerona Airport'
+        bus_number:
+          type: string
+          example: 'Airport bus'
+      type: object
+    FlightCard:
+      description: 'Карточка на самолет'
+      required:
+        - type
+        - departure
+        - arrival
+        - flight_number
+      properties:
+        type:
+          description: 'Вид транспорта'
+          type: string
+          example: flight
+        departure:
+          description: 'Точка отправления'
+          type: string
+          example: 'Gerona Airport'
+        arrival:
+          description: 'Точка прибытия'
+          type: string
+          example: Stockholm
+        flight_number:
+          description: 'Номер рейса'
+          type: string
+          example: SK455
+        gate:
+          description: 'Номер выхода'
+          type: string
+          example: 45B
+        seat:
+          description: 'Номер места'
+          type: string
+          example: 3A
+        baggage_drop:
+          description: 'Сдача багажа'
+          type: string
+          example: 'ticket counter 344'
+        baggage_transfer:
+          description: 'Перенос багажа'
+          type: boolean
+          example: true
+      type: object
+    TrainCard:
+      description: 'Карточка на поезд'
+      required:
+        - type
+        - departure
+        - arrival
+        - train_number
+      properties:
+        type:
+          type: string
+          example: train
+        departure:
+          type: string
+          example: Madrid
+        arrival:
+          type: string
+          example: Barcelona
+        train_number:
+          type: string
+          example: 78A
+        seat:
+          type: string
+          example: 45B
+      type: object
